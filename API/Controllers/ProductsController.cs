@@ -9,13 +9,12 @@ using Microsoft.EntityFrameworkCore;
 using Core.Specifications;
 using API.DTOs;
 using AutoMapper;
+using API.Controllers.Errors;
 
 namespace API.Controllers
 {
-    [ApiController]
 
-    [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductsController : BaseApiController
     {
 
         private readonly IGenericRepository<Product> _Productrepo;
@@ -48,6 +47,11 @@ namespace API.Controllers
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(id);
             var product = await _Productrepo.GetEntityWithSpec(spec);
+
+            if (product == null)
+            {
+                return NotFound(new ApiResponse(404));
+            }
 
             return _mapper.Map<Product,ProductsToReturnDto>(product);
         }
